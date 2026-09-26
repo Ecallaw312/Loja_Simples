@@ -1,24 +1,72 @@
 // Pega referências dos elementos que já existem no HTML
 const formProduto = document.querySelector("#form-produto");
 const listaProdutos = document.querySelector("#lista-produtos");
+const botaoFormulario = document.querySelector("#botao-formulario");
 
-// Escuta o evento de "enviar" do formulário
+// Guarda o produto que está sendo editado
+let itemEditando = null;
+
+// Escuta o evento de enviar do formulário
 formProduto.addEventListener("submit", function (evento) {
-  // Sem isso, o navegador recarregaria a página ao enviar o formulário
   evento.preventDefault();
 
-  // Lê o valor digitado em cada campo
+  // Lê os valores digitados
   const nome = document.querySelector("#nome").value;
   const preco = document.querySelector("#preco").value;
   const quantidade = document.querySelector("#quantidade").value;
 
-  // Cria um novo item de lista (<li>) com o texto do produto
-  const item = document.createElement("li");
-  item.textContent = `${nome} - R$ ${Number(preco).toFixed(2)} (${quantidade} un.)`;
+  // Se estiver editando um produto
+  if (itemEditando !== null) {
+    itemEditando.firstChild.textContent =
+      `${nome} - R$ ${Number(preco).toFixed(2)} (${quantidade} un.)`;
 
-  // Adiciona o novo item no final da lista
+    itemEditando = null;
+
+    formProduto.reset();
+
+    // Volta o botão para o estado normal
+    botaoFormulario.textContent = "Adicionar produto";
+
+    return;
+  }
+
+  // Cria um novo item
+  const item = document.createElement("li");
+
+  item.textContent =
+    `${nome} - R$ ${Number(preco).toFixed(2)} (${quantidade} un.)`;
+
+  // Cria botão Editar
+  const botaoEditar = document.createElement("button");
+  botaoEditar.textContent = "Editar";
+
+  botaoEditar.addEventListener("click", function () {
+    itemEditando = item;
+
+    // Coloca os dados do produto no formulário
+    document.querySelector("#nome").value = nome;
+    document.querySelector("#preco").value = preco;
+    document.querySelector("#quantidade").value = quantidade;
+
+    // Altera o texto do botão
+    botaoFormulario.textContent = "Salvar alterações";
+  });
+
+  // Cria botão Remover
+  const botaoRemover = document.createElement("button");
+  botaoRemover.textContent = "Remover";
+
+  botaoRemover.addEventListener("click", function () {
+    item.remove();
+  });
+
+  // Adiciona os botões ao produto
+  item.appendChild(botaoEditar);
+  item.appendChild(botaoRemover);
+
+  // Adiciona o produto à lista
   listaProdutos.appendChild(item);
 
-  // Limpa o formulário para o próximo cadastro
+  // Limpa o formulário
   formProduto.reset();
 });
