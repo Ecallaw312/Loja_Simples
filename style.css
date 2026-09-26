@@ -84,6 +84,20 @@ button:hover {
   background-color: #255a3f;
 }
 
+.mensagem-erro {
+  min-height: 18px;
+  margin: 8px 0 0;
+  color: #b42318;
+  font-size: 13px;
+}
+
+.mensagem-vazia {
+  margin: 0 0 12px;
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+}
+
 ul#lista-produtos {
   list-style: none;
   margin: 0;
@@ -94,10 +108,38 @@ ul#lista-produtos {
 }
 
 ul#lista-produtos li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 10px;
   background-color: #f4f4f7;
   border-radius: 4px;
   font-size: 14px;
+}
+
+.texto-produto {
+  flex: 1;
+}
+
+.acoes-produto {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+ul#lista-produtos li button {
+  margin-top: 0;
+  padding: 7px 9px;
+  font-size: 13px;
+}
+
+ul#lista-produtos li button:last-child {
+  background-color: #a33a3a;
+}
+
+ul#lista-produtos li button:last-child:hover {
+  background-color: #812d2d;
 }
 
 footer {

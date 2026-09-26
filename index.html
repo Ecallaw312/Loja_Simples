@@ -25,17 +25,14 @@
           <input type="number" id="quantidade" name="quantidade" min="0" placeholder="Ex: 10" required />
 
           <button type="submit" id="botao-formulario">Adicionar produto</button>
+          <p id="mensagem-validacao" class="mensagem-erro" role="alert"></p>
         </form>
       </section>
 
       <section class="cartao">
-        <h2>Produtos cadastrados</h2>
-        <ul id="lista-produtos">
-          <li>Caderno - R$ 12.50 (30 un.)</li>
-          <li>Caneta - R$ 2.00 (100 un.)</li>
-          <li>Mochila - R$ 89.90 (8 un.)</li>
-          <li>Estojo - R$ 15.00 (20 un.)</li>
-        </ul>
+        <h2>Produtos cadastrados: <span id="contador-produtos">0</span></h2>
+        <p id="mensagem-vazia" class="mensagem-vazia">Nenhum produto cadastrado.</p>
+        <ul id="lista-produtos"></ul>
       </section>
     </main>
     <footer>

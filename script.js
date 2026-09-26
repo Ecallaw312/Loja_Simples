@@ -1,72 +1,118 @@
-// Pega referências dos elementos que já existem no HTML
 const formProduto = document.querySelector("#form-produto");
 const listaProdutos = document.querySelector("#lista-produtos");
 const botaoFormulario = document.querySelector("#botao-formulario");
+const contadorProdutos = document.querySelector("#contador-produtos");
+const mensagemVazia = document.querySelector("#mensagem-vazia");
+const mensagemValidacao = document.querySelector("#mensagem-validacao");
 
-// Guarda o produto que está sendo editado
 let itemEditando = null;
 
-// Escuta o evento de enviar do formulário
-formProduto.addEventListener("submit", function (evento) {
-  evento.preventDefault();
+const produtosIniciais = [
+  { nome: "Caderno", preco: 12.5, quantidade: 30 },
+  { nome: "Caneta", preco: 2, quantidade: 100 },
+  { nome: "Mochila", preco: 89.9, quantidade: 8 },
+  { nome: "Estojo", preco: 15, quantidade: 20 },
+];
 
-  // Lê os valores digitados
-  const nome = document.querySelector("#nome").value;
-  const preco = document.querySelector("#preco").value;
-  const quantidade = document.querySelector("#quantidade").value;
+function formatarPreco(preco) {
+  return Number(preco).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 
-  // Se estiver editando um produto
-  if (itemEditando !== null) {
-    itemEditando.firstChild.textContent =
-      `${nome} - R$ ${Number(preco).toFixed(2)} (${quantidade} un.)`;
+function atualizarLista() {
+  const quantidadeProdutos = listaProdutos.children.length;
+  contadorProdutos.textContent = quantidadeProdutos;
+  mensagemVazia.hidden = quantidadeProdutos > 0;
+}
 
-    itemEditando = null;
+function sairDoModoEdicao() {
+  itemEditando = null;
+  formProduto.reset();
+  botaoFormulario.textContent = "Adicionar produto";
+}
 
-    formProduto.reset();
-
-    // Volta o botão para o estado normal
-    botaoFormulario.textContent = "Adicionar produto";
-
-    return;
-  }
-
-  // Cria um novo item
+function criarItemProduto(produto) {
   const item = document.createElement("li");
-
-  item.textContent =
-    `${nome} - R$ ${Number(preco).toFixed(2)} (${quantidade} un.)`;
-
-  // Cria botão Editar
+  const textoProduto = document.createElement("span");
+  const acoesProduto = document.createElement("div");
   const botaoEditar = document.createElement("button");
+  const botaoRemover = document.createElement("button");
+
+  textoProduto.className = "texto-produto";
+  acoesProduto.className = "acoes-produto";
+  botaoEditar.type = "button";
   botaoEditar.textContent = "Editar";
+  botaoRemover.type = "button";
+  botaoRemover.textContent = "Remover";
+
+  function atualizarTexto() {
+    textoProduto.textContent =
+      `${produto.nome} - R$ ${formatarPreco(produto.preco)} (${produto.quantidade} un.)`;
+  }
 
   botaoEditar.addEventListener("click", function () {
     itemEditando = item;
-
-    // Coloca os dados do produto no formulário
-    document.querySelector("#nome").value = nome;
-    document.querySelector("#preco").value = preco;
-    document.querySelector("#quantidade").value = quantidade;
-
-    // Altera o texto do botão
+    document.querySelector("#nome").value = produto.nome;
+    document.querySelector("#preco").value = produto.preco;
+    document.querySelector("#quantidade").value = produto.quantidade;
+    mensagemValidacao.textContent = "";
     botaoFormulario.textContent = "Salvar alterações";
   });
 
-  // Cria botão Remover
-  const botaoRemover = document.createElement("button");
-  botaoRemover.textContent = "Remover";
-
   botaoRemover.addEventListener("click", function () {
+    if (itemEditando === item) {
+      sairDoModoEdicao();
+    }
     item.remove();
+    atualizarLista();
   });
 
-  // Adiciona os botões ao produto
-  item.appendChild(botaoEditar);
-  item.appendChild(botaoRemover);
+  atualizarTexto();
+  acoesProduto.appendChild(botaoEditar);
+  acoesProduto.appendChild(botaoRemover);
+  item.appendChild(textoProduto);
+  item.appendChild(acoesProduto);
 
-  // Adiciona o produto à lista
-  listaProdutos.appendChild(item);
+  item.atualizarProduto = function (novoProduto) {
+    produto.nome = novoProduto.nome;
+    produto.preco = novoProduto.preco;
+    produto.quantidade = novoProduto.quantidade;
+    atualizarTexto();
+  };
 
-  // Limpa o formulário
+  return item;
+}
+
+formProduto.addEventListener("submit", function (evento) {
+  evento.preventDefault();
+  mensagemValidacao.textContent = "";
+
+  const nome = document.querySelector("#nome").value.trim();
+  const preco = Number(document.querySelector("#preco").value);
+  const quantidade = Number(document.querySelector("#quantidade").value);
+
+  if (quantidade <= 0) {
+    mensagemValidacao.textContent = "A quantidade deve ser maior que zero.";
+    return;
+  }
+
+  const produto = { nome, preco, quantidade };
+
+  if (itemEditando !== null) {
+    itemEditando.atualizarProduto(produto);
+    sairDoModoEdicao();
+    return;
+  }
+
+  listaProdutos.appendChild(criarItemProduto(produto));
+  atualizarLista();
   formProduto.reset();
 });
+
+produtosIniciais.forEach(function (produto) {
+  listaProdutos.appendChild(criarItemProduto(produto));
+});
+
+atualizarLista();
